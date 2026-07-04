@@ -21,7 +21,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "*",  # Replace with your frontend URL later
+        "*", 
+        "https://howrareareyou-eta.vercel.app" # Replace with your frontend URL later
         # "http://localhost:5173",
         # "https://your-vercel-app.vercel.app"
     ],
