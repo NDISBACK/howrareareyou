@@ -171,12 +171,16 @@ function localFallback(answers) {
 function normalizeResult(apiData, answers) {
   if (!apiData) return localFallback(answers);
 
-  const name = apiData.archetype ?? "Visionary Builder";
+  // Your FastAPI /analyze response nests the score/archetype under "analysis":
+  // { report, profile, analysis: { rarity_score, percentile, archetype, description }, ... }
+  const analysis = apiData.analysis ?? apiData;
+
+  const name = analysis.archetype ?? "Visionary Builder";
   const key  = Object.keys(ARCHETYPES).find((k) => ARCHETYPES[k].name === name) ?? "builder";
   const base = ARCHETYPES[key];
 
   const insights = Array.isArray(apiData.insights)
-    ? apiData.insights.map((item) => ({ text: typeof item === "string" ? item : (item.text ?? String(item)) }))
+    ? apiData.insights.map((item) => ({ text: typeof item === "string" ? item : (item.text ?? item.insight ?? String(item)) }))
     : localFallback(answers).insights;
 
   const aiAnalysis =
@@ -185,12 +189,14 @@ function normalizeResult(apiData, answers) {
       : apiData.ai_analysis?.analysis ?? apiData.ai_analysis?.text ?? base.blurb;
 
   return {
-    score: apiData.rarity_score ?? 75,
-    percentile: apiData.percentile ?? 750,
-    archetype: { ...base, name, blurb: apiData.description ?? base.blurb },
+    score: analysis.rarity_score ?? 75,
+    percentile: analysis.percentile ?? 750,
+    archetype: { ...base, name, blurb: analysis.description ?? base.blurb },
     insights,
     aiAnalysis,
     futureProjection: apiData.future_projection ?? null,
+    matchedTraits: apiData.matched_traits ?? [],
+    warnings: apiData.warnings ?? [],
     isFromAPI: true,
   };
 }
@@ -401,15 +407,31 @@ function Analysis({ answers, intakeData, onDone }) {
     }, 500);
 
     const profile = answersToProfile(answers, intakeData);
+    console.log(`[/analyze] POST ${API_URL}/analyze`, profile);
     const minDelay = new Promise((res) => setTimeout(res, 500 * ANALYSIS_STEPS.length + 400));
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // give the backend 15s before giving up
 
     const apiCall = fetch(`${API_URL}/analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(profile),
+      signal: controller.signal,
     })
-      .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .catch(() => null);
+      .then(async (r) => {
+        if (!r.ok) {
+          const body = await r.text().catch(() => "");
+          throw new Error(`Backend responded ${r.status}: ${body}`);
+        }
+        return r.json();
+      })
+      .catch((err) => {
+        // Log the real reason instead of silently going offline.
+        console.error("[/analyze] request failed — falling back to offline estimate:", err);
+        return null;
+      })
+      .finally(() => clearTimeout(timeout));
 
     Promise.all([apiCall, minDelay]).then(([apiData]) => {
       clearInterval(stepTimer);
@@ -545,4 +567,4 @@ export default function App() {
       {screen === "results" && result && <Results result={result} onRestart={handleRestart} />}
     </div>
   );
-}AuthenticatorAttestationResponse
+}
