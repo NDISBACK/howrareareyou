@@ -21,8 +21,7 @@ import {
 ───────────────────────────────────────────── */
 
 const API_URL =
-  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) ||
-  "http://localhost:8000";
+  import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const C = {
   cream:    "#FFFBF3",
