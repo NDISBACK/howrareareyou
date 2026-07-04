@@ -20,7 +20,7 @@ Will it make you say *"Wait... that's actually me."*?
 
 Hopefully. 
 
-![Landing Page](assets/Screenshot 2026-07-04 at 7.24.57 PM.png)
+![Landing Page](assets/landing.png)
 
 ---
 
@@ -45,7 +45,7 @@ Nothing too serious.
 
 Just tell the app a little about yourself.
 
-![Landing Page](assets/Screenshot 2026-07-04 at 7.25.20 PM.png)
+![Landing Page](assets/question.png)
 ---
 
 ### Step 2
@@ -74,7 +74,7 @@ Not just a number.
 
 An actual explanation.
 
-![Landing Page](assets/Screenshot 2026-07-04 at 7.26.04 PM.png)
+![Landing Page](assets/report.png)
 
 ---
 
