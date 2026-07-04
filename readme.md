@@ -1,3 +1,5 @@
+AI USAGE DECLARATION :- AI has been used in this project to assist with debugging of the code as well as the formatting and some parts of the writing of DEVLOGS and this readme file.
+
 How Rare Are You?
 
 > *What if your hobbies, habits, and ambitions could tell a story about who you are?*
