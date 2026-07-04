@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from models import UserProfile
 from rarity_engine import calculate_rarity
-from archetypes import determine_archetype
+import determine_archetype
 from insights import generate_insights
 from groq_analysis import generate_ai_analysis
 from future_projections import generate_future_projection
